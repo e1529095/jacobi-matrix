@@ -7,7 +7,7 @@ EXE=JACOBI2D
 
 OBJECTS=$(addprefix build/,main.o functions.o)
 
-build/functions.o : functions.h
+build/functions.o : src/functions.h
 
 CXX=g++
 CXX_CFLAGS_MANDATORY=-std=c++14
@@ -25,4 +25,4 @@ build/%.o:  src/%.cpp
 	$(CXX) $(CXX_CFLAGS) -c $< -o $@
 
 $(EXE):  $(OBJECTS)
-	$(CXX) $(CXX_LFLAGS) $^ -o $@
+	$(CXX) $(CXX_LFLAGS) $^ -o build/$@
