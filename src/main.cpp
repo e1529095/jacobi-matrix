@@ -2,6 +2,7 @@
 #include <iostream>
 #include <fstream>
 #include <random>
+#include <chrono>
 
 using namespace std;
 
@@ -22,7 +23,7 @@ int generateLinSystemCOO(const double L
                         ,int* const cooCol
                         ,double* const cooMat
                         ,double* const rhs
-                        ,int& nnz 
+                        ,int& nnz
                         ,ofstream& LOG_FILE);
 
 double computeError(const double L
@@ -48,14 +49,14 @@ double computeResidual(const int nnz
                    ,const int * const cooRow
                    ,const int * const cooCol
                    ,const double * const cooMat
-                   ,const double * const sol 
-                   ,const double * const rhs 
+                   ,const double * const sol
+                   ,const double * const rhs
                    ,      double * const aux);
 
 #include "functions.h"
 
 int main(int argc, char* argv[]) {
-  
+
    constexpr static const int SIZE_STENCIL = 5;
    constexpr static const double L = 1.0;
 
@@ -100,7 +101,7 @@ int main(int argc, char* argv[]) {
    int iters;
    double res;
    double err;
-   double seconds; 
+   double seconds;
    chrono::steady_clock::time_point tp0;
    chrono::duration<double> tDuration;
 
@@ -130,7 +131,7 @@ int main(int argc, char* argv[]) {
    LOG_FILE << "res     : " << res   << endl;
    LOG_FILE << "err     : " << err   << endl;
    LOG_FILE << "seconds : " << seconds << endl;
-   
+
    // store results results
    fwrite(&iters   , sizeof(int)   , 1, fidA);
    fwrite(&res     , sizeof(double), 1, fidA);
@@ -163,13 +164,13 @@ int main(int argc, char* argv[]) {
    LOG_FILE << "res   : " << res   << endl;
    LOG_FILE << "err   : " << err   << endl;
    LOG_FILE << "wall t: " << seconds << endl;
-   
+
    // store results results
    fwrite(&iters   , sizeof(int)   , 1, fidB);
    fwrite(&res     , sizeof(double), 1, fidB);
    fwrite(&err     , sizeof(double), 1, fidB);
    fwrite(&seconds , sizeof(double), 1, fidB);
- 
+
    // solver Jacobi C --------------------------------------- //
    LOG_FILE << endl << "SOLVER JACOBI C" << endl << endl;
 
@@ -194,7 +195,7 @@ int main(int argc, char* argv[]) {
    LOG_FILE << "res   : " << res   << endl;
    LOG_FILE << "err   : " << err   << endl;
    LOG_FILE << "wall t: " << seconds << endl;
-   
+
    // store results results
    fwrite(&iters   , sizeof(int)   , 1, fidB);
    fwrite(&res     , sizeof(double), 1, fidB);
@@ -238,7 +239,7 @@ int generateLinSystemCOO(const double L
    const double a11 = -(2.0/DXSQ+2.0/DYSQ);
    const double a21 = 1.0/DXSQ;
    const double a12 = 1.0/DYSQ;
-  
+
    // fill matrix
    //LOG_FILE << "main nested loop " << endl;
    nnz=0;
@@ -269,7 +270,7 @@ int generateLinSystemCOO(const double L
 
          rhs[l] = 0.0;
 
-         
+
       }
    }
 
@@ -300,7 +301,7 @@ int generateLinSystemCOO(const double L
          nnz+=4;
 
          rhs[l] = 0.0;
-         
+
       }
    }
 
@@ -332,7 +333,7 @@ int generateLinSystemCOO(const double L
          nnz+=4;
 
          rhs[l] = 0.0;
-         
+
       }
    }
 
@@ -363,7 +364,7 @@ int generateLinSystemCOO(const double L
          nnz+=4;
 
          rhs[l] = 0.0;
-         
+
       }
    }
 
@@ -398,7 +399,7 @@ int generateLinSystemCOO(const double L
          //LOG_FILE << "xi = " << xi << endl;
          rhs[l] = -a12*std::sin(M_PI*xi);
          //LOG_FILE << "rhs = " << rhs[l] << endl;
-         
+
       }
    }
 
@@ -426,7 +427,7 @@ int generateLinSystemCOO(const double L
          nnz+=3;
 
          rhs[l] = 0.0;
-         
+
       }
    }
 
@@ -454,7 +455,7 @@ int generateLinSystemCOO(const double L
          nnz+=3;
 
          rhs[l] = 0.0;
-         
+
       }
    }
 
@@ -483,7 +484,7 @@ int generateLinSystemCOO(const double L
 
          const double xi = static_cast<double>(i)*DX;
          rhs[l] = -a12*std::sin(M_PI*xi);
-         
+
       }
    }
 
@@ -512,7 +513,7 @@ int generateLinSystemCOO(const double L
 
          const double xi = static_cast<double>(i)*DX;
          rhs[l] = -a12*std::sin(M_PI*xi);
-         
+
       }
    }
 
@@ -545,7 +546,7 @@ int solveJacobi2D_A(const int nnz
          while ( row == l and inz <= nnz-1) {
             const int col=cooCol[inz];
             const double coeff=cooMat[inz];
-            if (row == col) { 
+            if (row == col) {
                a11 = coeff;
             } else {
                sum+= coeff*sol[col];
@@ -574,7 +575,7 @@ int solveJacobi2D_A(const int nnz
       LOG_FILE << " - residual achieved " << res << endl;
       LOG_FILE << " - iterations " << iters << endl;
       return EXIT_SUCCESS;
-   } else { 
+   } else {
       LOG_FILE << "Failure of convergence procedure" << endl;
       LOG_FILE << " - residual achieved " << res << endl;
       LOG_FILE << " - iterations " << iters << endl;
@@ -590,8 +591,8 @@ double computeResidual(const int nnz
                    ,const int * const cooRow
                    ,const int * const cooCol
                    ,const double * const cooMat
-                   ,const double * const sol 
-                   ,const double * const rhs 
+                   ,const double * const sol
+                   ,const double * const rhs
                    ,      double * const aux) {
 
    for (int l = 0; l<N;++l) {
@@ -632,10 +633,10 @@ double computeError(const double L
          const double xi = static_cast<double>(i)*DX;
 
          const int l = ij2l(i,j,NX);
- 
+
          const double ref = sinh(M_PI*yi)*sin(M_PI*xi)/sinh(M_PI);
          err = max(err,abs(ref-sol[l]));
-         
+
       }
    }
    return err;
