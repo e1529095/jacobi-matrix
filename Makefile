@@ -20,7 +20,7 @@ CXX_CFLAGS=$(CXX_CFLAGS_MANDATORY) $(CXX_CFLAGS_OPTIONAL)
 CXX_LFLAGS=
 
 
-build/%.o:  ./%.cpp
+build/%.o:  src/%.cpp
 	[ -d $(@D) ] || mkdir $(@D) && true
 	$(CXX) $(CXX_CFLAGS) -c $< -o $@
 
